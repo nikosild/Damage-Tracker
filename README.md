@@ -48,7 +48,7 @@ The plugin automatically detects which activity you are in and keeps separate st
 - **Helltide** — detected via the helltide API flag
 - **General** — fallback for everything else
 
-Each zone has its own independent session. Switching zones resets that zone's session automatically and saves the completed session to the log file.
+Each zone has its own independent session. **Stats accumulate across multiple visits to the same zone** — re-entering The Pit, for example, continues adding to the same session rather than starting from zero. Sessions are only reset when you press Reset All Sessions manually or use the keybind. This means your Pit total reflects your entire play session, not just one run.
 
 ### Damage tracking
 
@@ -56,9 +56,7 @@ Enemy health and damage shield are sampled every ~33ms. The delta between consec
 
 ### Kill counting
 
-Kills are detected by monitoring the local player's XP. Every time XP increases, a kill is registered. This is more reliable than watching for actors to disappear from the actor list, which can miss kills depending on timing.
-
-> **Note:** Kill counting will not work correctly if the player is at maximum Paragon level and no longer gains XP from kills.
+Kills are detected using two methods in order of priority: the native `is_dead()` flag on the actor, and actor disappearance from the valid enemy list as a fallback. When a kill is detected, any remaining health and shield that was not yet captured in the last sample is also recorded as damage, reducing loss from the killing blow.
 
 ### Rolling DPS
 
@@ -74,10 +72,10 @@ Elapsed time for the current zone session is displayed in hours, minutes, and se
 
 ### Log file
 
-A log file is written to `B:\GLYKO\scripts\Damage Tracker\damage_tracker_log.txt` and updated every 5 seconds. It contains two sections:
+A log file is written to `damage_tracker_log.txt` in the plugin root folder and updated every 5 seconds. It contains two sections:
 
 - **Active sessions** — live stats for all zones currently in memory
-- **Session history** — a permanent record of every completed session, appended each time you reset or change zone
+- **Session history** — a permanent record of every session, appended each time you press Reset All Sessions
 
 If you open the log in Notepad++ with auto-reload enabled, you can watch the stats update live while playing.
 
@@ -147,5 +145,6 @@ Damage Tracker/
 
 - Use a **longer DPS window** (30s) for a stable average that reflects your sustained output. Use a **shorter window** (3–5s) if you want a more reactive number that spikes with burst damage.
 - The **Peak DPS** value is the best single number to compare between sessions, as it captures your highest sustained burst over the window rather than an average dragged down by downtime.
-- If numbers seem very low, check that you are in the correct zone — each zone tracks independently and a fresh zone session starts at zero.
+- Stats accumulate across multiple runs in the same zone. If you want a clean slate for a new run, press Reset All Sessions (or use the keybind) before entering.
+- If numbers seem very low right after loading, give it a second — the tracker needs one pulse to register existing enemies before it starts recording deltas.
 - The log file is a plain text file. You can open it with any text editor at any time.
