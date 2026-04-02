@@ -49,6 +49,14 @@ function tracker.reset_all()
     console.print('[Damage Tracker | ALiTiS] All sessions reset.')
 end
 
+-- Reset all sessions without saving to log (used by Clear Log)
+function tracker.reset_all_silent()
+    for zone in pairs(sessions) do
+        sessions[zone] = new_session()
+    end
+    console.print('[Damage Tracker | ALiTiS] All sessions cleared.')
+end
+
 function tracker.reset_zone(zone)
     local now = get_time_since_inject()
     local log = get_logger()

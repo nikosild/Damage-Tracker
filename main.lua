@@ -21,11 +21,13 @@ on_update(function()
     -- Reset button
     if gui.elements.reset_btn:get() then
         tracker.reset_all()
+        logger.force_live_update(tracker, now)
     end
 
     -- Reset keybind
     if gui.elements.reset_keybind:get_state() == 1 then
         tracker.reset_all()
+        logger.force_live_update(tracker, now)
     end
 
     -- Open log button
@@ -33,9 +35,10 @@ on_update(function()
         logger.open_file()
     end
 
-    -- Clear log button
+    -- Clear log button — also resets all in-memory sessions
     if gui.elements.clear_log_btn:get() then
         logger.clear_log()
+        tracker.reset_all_silent()
     end
 
     if not settings.enabled then return end

@@ -139,6 +139,14 @@ function logger.live_update(tracker, now)
 end
 
 ------------------------------------------------------------
+-- Force immediate live update (bypasses interval timer)
+------------------------------------------------------------
+function logger.force_live_update(tracker, now)
+    last_save = 0
+    logger.live_update(tracker, now)
+end
+
+------------------------------------------------------------
 -- Open history file with OS default app + print to console
 ------------------------------------------------------------
 function logger.open_file()
