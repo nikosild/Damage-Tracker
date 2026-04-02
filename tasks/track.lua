@@ -1,7 +1,6 @@
 ------------------------------------------------------------
 -- Task: Track Damage
 -- Samples enemy health + shield each pulse and records deltas
--- Uses XP delta for accurate kill counting
 ------------------------------------------------------------
 
 local settings = require 'core.settings'
@@ -10,7 +9,6 @@ local zones    = require 'core.zones'
 
 local last_update = 0.0
 local last_zone   = nil
-local last_xp     = nil  -- tracks player XP for kill detection
 
 local track_task = { name = "Track Damage" }
 
@@ -42,27 +40,11 @@ function track_task.Execute()
     if zone ~= last_zone then
         tracker.reset_zone(zone)
         last_zone = zone
-        last_xp   = nil  -- reset XP baseline on zone change
     end
 
     tracker.current_zone = zone
     local s = tracker.get_session(zone)
 
-    -- XP-based kill counting
-    local player  = get_local_player()
-    local cur_xp  = player:get_current_experience()
-
-    if last_xp == nil then
-        last_xp = cur_xp
-    elseif cur_xp > last_xp then
-        -- XP went up = one or more kills happened
-        -- We don't know exactly how many but at minimum 1
-        -- Use difference heuristic: most kills give similar XP chunks
-        tracker.record_kill(zone)
-        last_xp = cur_xp
-    end
-
-    -- Damage tracking via HP + Shield delta
     local seen = {}
 
     local actors = actors_manager:get_all_actors()
@@ -85,6 +67,7 @@ function track_task.Execute()
                     if effective > 0 then
                         tracker.record_damage(zone, effective, now)
                     end
+                    tracker.record_kill(zone)
                     s.last_health[id] = nil
                     seen[id] = nil
                 else
@@ -96,12 +79,13 @@ function track_task.Execute()
         end
     end
 
-    -- Actors that vanished without is_dead() (despawn fallback)
+    -- Actors that vanished without is_dead() firing (despawn fallback)
     for id, prev in pairs(s.last_health) do
         if not seen[id] then
             if prev.effective > 0 then
                 tracker.record_damage(zone, prev.effective, now)
             end
+            tracker.record_kill(zone)
             s.last_health[id] = nil
         end
     end
