@@ -7,11 +7,8 @@ local settings = require 'core.settings'
 local tracker  = require 'core.tracker'
 local zones    = require 'core.zones'
 
-local last_update    = 0.0
-local last_zone      = nil
-local pending_zone   = nil   -- zone candidate waiting to be confirmed
-local pending_since  = 0.0   -- when we first saw the candidate
-local ZONE_DEBOUNCE  = 2.0   -- seconds a new zone must be stable before accepting
+local last_update = 0.0
+local last_zone   = nil
 
 local track_task = { name = "Track Damage" }
 
@@ -37,29 +34,16 @@ function track_task.Execute()
     if now - last_update < 0.033 then return end
     last_update = now
 
-    local detected = zones.detect()
+    local zone = zones.detect()
 
-    -- Debounce zone changes: only commit after zone is stable for ZONE_DEBOUNCE seconds
-    if detected ~= last_zone then
-        if detected ~= pending_zone then
-            -- New candidate, start timer
-            pending_zone  = detected
-            pending_since = now
-        elseif now - pending_since >= ZONE_DEBOUNCE then
-            -- Candidate has been stable long enough — commit
-            tracker.reset_zone(detected)
-            last_zone    = detected
-            pending_zone = nil
-        end
-        -- During debounce period, keep using last_zone for tracking
-    else
-        -- Detected zone matches confirmed zone — clear any pending candidate
-        pending_zone = nil
+    -- Track zone changes for current_zone display only.
+    -- Never clear last_health or reset session on zone change —
+    -- the despawn loop handles stale actors naturally each pulse.
+    if zone ~= last_zone then
+        last_zone = zone
     end
 
-    local zone = last_zone or detected
     tracker.current_zone = zone
-
     local s = tracker.get_session(zone)
     local seen = {}
 
