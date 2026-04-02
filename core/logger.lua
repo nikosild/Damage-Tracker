@@ -7,7 +7,7 @@ local utils  = require 'core.utils'
 
 local logger = {}
 
-local LOG_FILE    = "B:\\GLYKO\\scripts\\Damage Tracker\\damage_tracker_log.txt"
+local LOG_FILE    = "damage_tracker_log.txt"
 local SAVE_INTERVAL = 5.0  -- seconds between live updates
 local last_save   = 0
 

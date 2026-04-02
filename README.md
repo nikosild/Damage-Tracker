@@ -27,16 +27,12 @@ Damage Tracker monitors enemies in real time and displays live combat statistics
 
 ## Installation
 
-1. Place the plugin folder inside your scripts directory:
-   ```
-   B:\GLYKO\scripts\Damage Tracker\
-   ```
-2. Make sure the `Damage Tracker` folder exists before launching — the plugin writes its log file there and cannot create the folder itself.
-3. Load the plugin through your scripting framework as usual.
+1. Place the plugin folder anywhere inside your scripts directory.
+2. Load the plugin through your scripting framework as usual.
 
-The log file will be created automatically at:
+The log file will be created automatically in the **same folder as the plugin**:
 ```
-B:\GLYKO\scripts\Damage Tracker\damage_tracker_log.txt
+damage_tracker_log.txt
 ```
 
 ---
@@ -142,7 +138,7 @@ Damage Tracker/
     colors.lua             — centralised color theme for the overlay
   tasks/
     track.lua              — main update task: samples actors, records damage and kills
-  damage_tracker_log.txt   — auto-generated session log (do not edit while plugin is running)
+  damage_tracker_log.txt        — auto-generated, written to the plugin root folder
 ```
 
 ---
