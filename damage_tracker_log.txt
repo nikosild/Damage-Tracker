@@ -1,0 +1,91 @@
+================================================
+  DAMAGE TRACKER | ALiTiS | v1.0
+  Last updated: 2026-04-02 17:40:43
+  (This file updates every 5 seconds)
+================================================
+
+[ ACTIVE SESSIONS ]
+
+  General        [CURRENT]
+    Time    : 1m 45s
+    Total   : 358.5K
+    Peak    : 6.4K DPS
+    Kills   : 0
+
+================================================
+[ SESSION HISTORY ]
+(appended below after each reset or zone change)
+================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
