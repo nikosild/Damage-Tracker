@@ -7,8 +7,11 @@ local settings = require 'core.settings'
 local tracker  = require 'core.tracker'
 local zones    = require 'core.zones'
 
-local last_update = 0.0
-local last_zone   = nil
+local last_update    = 0.0
+local last_zone      = nil
+local pending_zone   = nil   -- zone candidate waiting to be confirmed
+local pending_since  = 0.0   -- when we first saw the candidate
+local ZONE_DEBOUNCE  = 2.0   -- seconds a new zone must be stable before accepting
 
 local track_task = { name = "Track Damage" }
 
@@ -16,7 +19,6 @@ function track_task.shouldExecute()
     return settings.enabled
 end
 
--- Returns hp, shield, and effective HP (hp + shield)
 local function get_effective_hp(actor)
     local hp     = actor:get_current_health()
     local shield = 0
@@ -35,16 +37,30 @@ function track_task.Execute()
     if now - last_update < 0.033 then return end
     last_update = now
 
-    local zone = zones.detect()
+    local detected = zones.detect()
 
-    if zone ~= last_zone then
-        tracker.reset_zone(zone)
-        last_zone = zone
+    -- Debounce zone changes: only commit after zone is stable for ZONE_DEBOUNCE seconds
+    if detected ~= last_zone then
+        if detected ~= pending_zone then
+            -- New candidate, start timer
+            pending_zone  = detected
+            pending_since = now
+        elseif now - pending_since >= ZONE_DEBOUNCE then
+            -- Candidate has been stable long enough — commit
+            tracker.reset_zone(detected)
+            last_zone    = detected
+            pending_zone = nil
+        end
+        -- During debounce period, keep using last_zone for tracking
+    else
+        -- Detected zone matches confirmed zone — clear any pending candidate
+        pending_zone = nil
     end
 
+    local zone = last_zone or detected
     tracker.current_zone = zone
-    local s = tracker.get_session(zone)
 
+    local s = tracker.get_session(zone)
     local seen = {}
 
     local actors = actors_manager:get_all_actors()
