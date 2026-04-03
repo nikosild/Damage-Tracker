@@ -88,8 +88,8 @@ end
 
 function tracker.record_damage(zone, dmg, now)
     local s = tracker.get_session(zone)
-    s.total_damage = s.total_damage + (dmg * 15000)
-    table.insert(s.damage_log, { t = now, dmg = dmg * 15000 })
+    s.total_damage = s.total_damage + (dmg * 1500)
+    table.insert(s.damage_log, { t = now, dmg = dmg * 1500 })
 end
 
 function tracker.record_kill(zone)
